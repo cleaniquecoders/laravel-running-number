@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "cleaniquecoders/laravel-running-number",
+    "description": "Generate running number when creating new records in your table.",
     "keywords": [
-        ":vendor_name",
+        "cleaniquecoders",
         "laravel",
-        ":package_slug"
+        "laravel-running-number"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/cleaniquecoders/laravel-running-number",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Nasrul Hazim Bin Mohamad",
+            "email": "nasrulhazim.m@gmail.com",
             "role": "Developer"
         }
     ],
@@ -34,13 +34,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "CleaniqueCoders\\RunningNumber\\": "src",
+            "CleaniqueCoders\\RunningNumber\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "CleaniqueCoders\\RunningNumber\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -54,10 +54,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "CleaniqueCoders\\RunningNumber\\RunningNumberServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "RunningNumber": "CleaniqueCoders\\RunningNumber\\Facades\\RunningNumber"
             }
         }
     },

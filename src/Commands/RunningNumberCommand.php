@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace CleaniqueCoders\RunningNumber\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class RunningNumberCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-running-number';
 
     public $description = 'My command';
 
