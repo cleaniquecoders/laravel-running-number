@@ -11,6 +11,6 @@ class RunningNumber extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'laravel-running-number';
+        return 'running-number';
     }
 }

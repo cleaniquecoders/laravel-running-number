@@ -16,10 +16,10 @@ class RunningNumberServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('laravel-running-number')
+            ->name('running-number')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_laravel-running-number_table')
+            ->hasMigration('create_running_number_table')
             ->hasCommand(RunningNumberCommand::class);
     }
 }
