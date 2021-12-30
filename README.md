@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/cleaniquecoders/laravel-running-number/Check%20&%20fix%20styling?label=code%20style)](https://github.com/cleaniquecoders/laravel-running-number/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/cleaniquecoders/laravel-running-number.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/laravel-running-number)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Generate running number when creating new records in your table.
 
 ## Support us
 
@@ -36,24 +36,18 @@ You can publish the config file with:
 php artisan vendor:publish --tag="laravel-running-number-config"
 ```
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-running-number-views"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
+Please make sure to configure the `config/running-number` types, in order to support your requirement.
 
 ## Usage
 
 ```php
-$laravel-running-number = new CleaniqueCoders\RunningNumber();
-echo $laravel-running-number->echoPhrase('Hello, CleaniqueCoders!');
+running_number()->type($type)->generate();
+
+// OR
+
+use CleaniqueCoders\RunningNumber\Generator as RunningNumberGenerator;
+
+RunningNumberGenerator::make()->type($type)->generate();
 ```
 
 ## Testing
