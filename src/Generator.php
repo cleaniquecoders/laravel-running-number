@@ -1,14 +1,13 @@
-<?php 
+<?php
 
 namespace CleaniqueCoders\RunningNumber;
 
 use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
 use CleaniqueCoders\RunningNumber\Contracts\Presenter;
 use CleaniqueCoders\RunningNumber\Exceptions\InvalidRunningNumberTypeException;
-use CleaniqueCoders\RunningNumber\Models\RunningNumber;
 
-class Generator implements GeneratorContract {
-
+class Generator implements GeneratorContract
+{
     protected $toUpperCase = true;
     protected $presenter;
     protected $type;
@@ -69,7 +68,7 @@ class Generator implements GeneratorContract {
 
     private function createRunningNumberTypeIfNotExists()
     {
-        if(! config('running-number.model')::where('type', $this->getType())->exists()) {
+        if (! config('running-number.model')::where('type', $this->getType())->exists()) {
             config('running-number.model')::create(['type' => $this->getType()]);
         }
     }

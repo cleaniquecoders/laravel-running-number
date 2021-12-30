@@ -2,9 +2,9 @@
 
 namespace CleaniqueCoders\RunningNumber;
 
+use CleaniqueCoders\RunningNumber\Commands\RunningNumberCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use CleaniqueCoders\RunningNumber\Commands\RunningNumberCommand;
 
 class RunningNumberServiceProvider extends PackageServiceProvider
 {
