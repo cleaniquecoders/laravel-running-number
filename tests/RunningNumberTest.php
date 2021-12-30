@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     include_once __DIR__ . '/../database/migrations/create_running_number_table.php.stub';
 
-    (new \CreateRunnningNumberTable())->up();
+    (new \CreateRunningNumberTable())->up();
 });
 
 it('can has running number helper', function () {
