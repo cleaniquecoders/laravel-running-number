@@ -2,7 +2,6 @@
 
 namespace CleaniqueCoders\RunningNumber;
 
-use CleaniqueCoders\RunningNumber\Commands\RunningNumberCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -17,9 +16,7 @@ class RunningNumberServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('running-number')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_running_number_table')
-            ->hasCommand(RunningNumberCommand::class);
+            ->hasConfigFile('running-number')
+            ->hasMigration('create_running_number_table');
     }
 }
