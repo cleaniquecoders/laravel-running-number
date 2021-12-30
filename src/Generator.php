@@ -10,7 +10,9 @@ use CleaniqueCoders\RunningNumber\Models\RunningNumber;
 class Generator implements GeneratorContract {
 
     protected $toUpperCase = true;
-
+    protected $presenter;
+    protected $type;
+    
     public function __construct()
     {
         $presenter = config('running-number.presenter');
