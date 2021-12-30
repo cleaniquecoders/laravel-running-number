@@ -18,14 +18,14 @@ composer require cleaniquecoders/laravel-running-number
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-running-number-migrations"
+php artisan vendor:publish --tag="running-number-migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-running-number-config"
+php artisan vendor:publish --tag="running-number-config"
 ```
 
 Please make sure to configure the `config/running-number` types, in order to support your requirement.
