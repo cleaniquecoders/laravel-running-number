@@ -2,9 +2,9 @@
 
 namespace CleaniqueCoders\RunningNumber\Tests;
 
+use CleaniqueCoders\RunningNumber\RunningNumberServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use CleaniqueCoders\RunningNumber\RunningNumberServiceProvider;
 
 class TestCase extends Orchestra
 {

@@ -5,11 +5,9 @@ use CleaniqueCoders\RunningNumber\Enums\Organization;
 use CleaniqueCoders\RunningNumber\Generator as RunningNumberGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\assertDatabaseHas;
-
 uses(RefreshDatabase::class);
 
-beforeEach(function(){
+beforeEach(function () {
     include_once __DIR__ . '/../database/migrations/create_running_number_table.php.stub';
 
     (new \CreateRunnningNumberTable())->up();
@@ -29,9 +27,8 @@ it('it can generate PROFILE001 running number', function () {
 });
 
 it('it can generate 10 running numbers for each types in config', function () {
-    foreach(config('running-number.types') as $type)
-    {
-        for ($i=0; $i < 10; $i++) { 
+    foreach (config('running-number.types') as $type) {
+        for ($i = 0; $i < 10; $i++) {
             RunningNumberGenerator::make()->type($type)->generate();
         }
         expect(config('running-number.model')::where('type', strtoupper($type))->first()->number == 10)->toBeTrue();

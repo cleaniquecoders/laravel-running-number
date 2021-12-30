@@ -1,7 +1,8 @@
-<?php 
+<?php
 
 namespace CleaniqueCoders\RunningNumber\Contracts;
 
-interface Presenter {
+interface Presenter
+{
     public function format($type, $number): string;
 }
