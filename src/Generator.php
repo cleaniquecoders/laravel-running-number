@@ -9,7 +9,9 @@ use CleaniqueCoders\RunningNumber\Exceptions\InvalidRunningNumberTypeException;
 class Generator implements GeneratorContract
 {
     protected $toUpperCase = true;
+
     protected $presenter;
+
     protected $type;
 
     public function __construct()
@@ -48,7 +50,7 @@ class Generator implements GeneratorContract
     public function generate(): string
     {
         if (! in_array($this->type, config('running-number.types'))) {
-            throw new InvalidRunningNumberTypeException('Unsupported ' . $this->type);
+            throw new InvalidRunningNumberTypeException('Unsupported '.$this->type);
         }
 
         $this->createRunningNumberTypeIfNotExists();

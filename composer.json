@@ -22,6 +22,7 @@
         "spatie/laravel-package-tools": "^1.14"
     },
     "require-dev": {
+        "laravel/pint": "^1.6",
         "nunomaduro/collision": "^7.0",
         "nunomaduro/larastan": "^2.4",
         "orchestra/testbench": "^8.0",
@@ -50,6 +51,7 @@
     "scripts": {
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint",
         "test-coverage": "vendor/bin/pest coverage"
     },
     "config": {

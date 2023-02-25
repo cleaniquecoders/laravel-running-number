@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    include_once __DIR__ . '/../database/migrations/create_running_number_table.php.stub';
+    include_once __DIR__.'/../database/migrations/create_running_number_table.php.stub';
 
     (new \CreateRunningNumberTable())->up();
 });

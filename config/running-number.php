@@ -9,7 +9,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | These value is the types of the running number you would like to create.
-    | The values can be any list of strings. As long listed here, the types 
+    | The values can be any list of strings. As long listed here, the types
     | are supported by your application to generate the running number.
     | It is recommended to use Laravel Spatie Enum for these values.
     |
@@ -45,11 +45,11 @@ return [
     | Running Number Concatenator
     |--------------------------------------------------------------------------
     |
-    | This class how you expect the output of the running number after it 
-    | was created. The desire format can be C0005, C-0005. 
+    | This class how you expect the output of the running number after it
+    | was created. The desire format can be C0005, C-0005.
     |
     */
-    
+
     'presenter' => \CleaniqueCoders\RunningNumber\Presenter::class,
 
     /*
