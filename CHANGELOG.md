@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-running-number` will be documented in this file.
 
+## Added Laravel 12 and PHP 8.4 Support - 2025-05-01
+
+### What's Changed
+
+* Bump aglipanci/laravel-pint-action from 2.3.1 to 2.4 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/26
+* Bump dependabot/fetch-metadata from 1.6.0 to 2.1.0 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/27
+* Bump ramsey/composer-install from 2 to 3 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/24
+* Bump actions/checkout from 3 to 4 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/21
+* Bump dependabot/fetch-metadata from 2.1.0 to 2.2.0 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/28
+* Bump dependabot/fetch-metadata from 2.2.0 to 2.3.0 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/29
+* Bump aglipanci/laravel-pint-action from 2.4 to 2.5 by @dependabot in https://github.com/cleaniquecoders/laravel-running-number/pull/30
+
+**Full Changelog**: https://github.com/cleaniquecoders/laravel-running-number/compare/2.2.0...2.3.0
+
 ## Added Laravel 11 Support - 2024-03-21
 
 ### What's Changed
