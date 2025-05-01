@@ -1,76 +1,76 @@
 {
-  "name": "cleaniquecoders/laravel-running-number",
-  "description": "Generate running number when creating new records in your table.",
-  "keywords": [
-    "cleaniquecoders",
-    "laravel",
-    "laravel-running-number"
-  ],
-  "homepage": "https://github.com/cleaniquecoders/laravel-running-number",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Nasrul Hazim Bin Mohamad",
-      "email": "nasrulhazim.m@gmail.com",
-      "role": "Developer"
-    }
-  ],
-  "require": {
-    "php": "^8.1 | ^8.2 | ^8.3",
-    "illuminate/contracts": "^9.0 | ^10.0 | ^11.0",
-    "spatie/laravel-enum": "^3.0",
-    "spatie/laravel-package-tools": "^1.14"
-  },
-  "require-dev": {
-    "larastan/larastan": "^2.9",
-    "laravel/pint": "^1.6",
-    "nunomaduro/collision": "^7.0",
-    "orchestra/testbench": "^8.0 | ^9.0",
-    "pestphp/pest": "^2.0",
-    "pestphp/pest-plugin-laravel": "^2.0",
-    "phpstan/extension-installer": "^1.1",
-    "phpstan/phpstan-deprecation-rules": "^1.0",
-    "phpstan/phpstan-phpunit": "^1.0",
-    "phpunit/phpunit": "^9.5|^10.0",
-    "spatie/laravel-ray": "^1.26"
-  },
-  "autoload": {
-    "psr-4": {
-      "CleaniqueCoders\\RunningNumber\\": "src",
-      "CleaniqueCoders\\RunningNumber\\Database\\Factories\\": "database/factories"
+    "name": "cleaniquecoders/laravel-running-number",
+    "description": "Generate running number when creating new records in your table.",
+    "keywords": [
+        "cleaniquecoders",
+        "laravel",
+        "laravel-running-number"
+    ],
+    "homepage": "https://github.com/cleaniquecoders/laravel-running-number",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nasrul Hazim Bin Mohamad",
+            "email": "nasrulhazim.m@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1 | ^8.2 | ^8.3 | ^8.4",
+        "illuminate/contracts": "^9.0 | ^10.0 | ^11.0",
+        "spatie/laravel-enum": "^3.0",
+        "spatie/laravel-package-tools": "^1.14"
     },
-    "files": [
-      "support/helpers.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "CleaniqueCoders\\RunningNumber\\Tests\\": "tests"
-    }
-  },
-  "scripts": {
-    "analyse": "vendor/bin/phpstan analyse",
-    "test": "vendor/bin/pest",
-    "format": "vendor/bin/pint",
-    "test-coverage": "vendor/bin/pest coverage"
-  },
-  "config": {
-    "sort-packages": true,
-    "allow-plugins": {
-      "pestphp/pest-plugin": true,
-      "phpstan/extension-installer": true
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "CleaniqueCoders\\RunningNumber\\RunningNumberServiceProvider"
-      ],
-      "aliases": {
-        "RunningNumber": "CleaniqueCoders\\RunningNumber\\Facades\\RunningNumber"
-      }
-    }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+    "require-dev": {
+        "larastan/larastan": "^2.9",
+        "laravel/pint": "^1.6",
+        "nunomaduro/collision": "^7.0",
+        "orchestra/testbench": "^8.0 | ^9.0",
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpunit/phpunit": "^9.5|^10.0",
+        "spatie/laravel-ray": "^1.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "CleaniqueCoders\\RunningNumber\\": "src",
+            "CleaniqueCoders\\RunningNumber\\Database\\Factories\\": "database/factories"
+        },
+        "files": [
+            "support/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CleaniqueCoders\\RunningNumber\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint",
+        "test-coverage": "vendor/bin/pest coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CleaniqueCoders\\RunningNumber\\RunningNumberServiceProvider"
+            ],
+            "aliases": {
+                "RunningNumber": "CleaniqueCoders\\RunningNumber\\Facades\\RunningNumber"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
