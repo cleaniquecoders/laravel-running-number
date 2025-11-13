@@ -4,6 +4,7 @@ namespace CleaniqueCoders\RunningNumber;
 
 use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
 use CleaniqueCoders\RunningNumber\Contracts\Presenter;
+use CleaniqueCoders\RunningNumber\Enums\ResetPeriod;
 use CleaniqueCoders\RunningNumber\Exceptions\InvalidRunningNumberTypeException;
 use CleaniqueCoders\RunningNumber\Exceptions\MaxNumberReachedException;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +67,88 @@ class Generator implements GeneratorContract
         $this->maxNumber = $number;
 
         return $this;
+    }
+
+    public function preview(): string
+    {
+        if (! in_array($this->type, config('running-number.types'))) {
+            throw new InvalidRunningNumberTypeException('Unsupported '.$this->type);
+        }
+
+        $query = config('running-number.model')::where('type', $this->getType());
+
+        if ($this->scope !== null) {
+            $query->where('scope', $this->scope);
+        } else {
+            $query->whereNull('scope');
+        }
+
+        $running_number = $query->first();
+
+        // If type doesn't exist yet, preview what the first number would be
+        if (! $running_number) {
+            return $this->presenter->format($this->getType(), $this->startingNumber + 1);
+        }
+
+        // Check if reset would happen
+        $nextNumber = $running_number->number;
+        if ($running_number->needsReset()) {
+            $nextNumber = 0;
+        }
+
+        // Get the next number (what would be generated)
+        $nextNumber = $nextNumber + 1;
+
+        return $this->presenter->format($this->getType(), $nextNumber);
+    }
+
+    public function generateBatch(int $count): array
+    {
+        if (! in_array($this->type, config('running-number.types'))) {
+            throw new InvalidRunningNumberTypeException('Unsupported '.$this->type);
+        }
+
+        if ($count <= 0) {
+            return [];
+        }
+
+        return DB::transaction(function () use ($count) {
+            $this->createRunningNumberTypeIfNotExists();
+
+            $query = config('running-number.model')::where('type', $this->getType());
+
+            if ($this->scope !== null) {
+                $query->where('scope', $this->scope);
+            } else {
+                $query->whereNull('scope');
+            }
+
+            $running_number = $query->lockForUpdate()->first();
+
+            // Check if reset is needed based on reset period
+            if ($running_number->needsReset()) {
+                $running_number->reset();
+            }
+
+            // Check if max number will be exceeded after batch
+            if ($this->maxNumber !== null && ($running_number->number + $count) > $this->maxNumber) {
+                throw new MaxNumberReachedException($this->getType(), $this->maxNumber);
+            }
+
+            $numbers = [];
+            $startNumber = $running_number->number + 1;
+
+            // Generate all numbers
+            for ($i = 0; $i < $count; $i++) {
+                $numbers[] = $this->presenter->format($this->getType(), $startNumber + $i);
+            }
+
+            // Update the counter once
+            $running_number->number = $startNumber + $count - 1;
+            $running_number->save();
+
+            return $numbers;
+        });
     }
 
     // Casting prefix will be good.
@@ -151,6 +234,6 @@ class Generator implements GeneratorContract
         }
 
         // Fall back to default reset period
-        return config('running-number.reset_period.default', 'never');
+        return config('running-number.reset_period.default', ResetPeriod::NEVER->value);
     }
 }

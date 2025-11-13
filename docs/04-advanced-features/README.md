@@ -8,6 +8,7 @@ This section covers advanced features of the Laravel Running Number package.
 - [Multiple Sequences](02-multiple-sequences.md) - Maintain separate sequences using scopes
 - [Custom Starting Numbers](03-custom-starting-numbers.md) - Start sequences from specific numbers
 - [Number Range Management](04-number-range-management.md) - Set maximum limits for sequences
+- [Preview & Bulk Generation](05-preview-and-batch.md) - Preview next numbers and generate in batches
 
 ## Quick Examples
 
@@ -58,4 +59,29 @@ $number = Generator::make()
     ->maxNumber(9999)
     ->generate();
 // Throws MaxNumberReachedException when limit is reached
+```
+
+### Preview Mode
+
+```php
+// Preview without incrementing
+$preview = Generator::make()
+    ->type('invoice')
+    ->preview();
+// Output: INVOICE002 (current is 001)
+
+// Useful for UI displays
+echo "Your next invoice will be: {$preview}";
+```
+
+### Bulk Generation
+
+```php
+// Generate multiple numbers at once
+$tickets = Generator::make()
+    ->type('ticket')
+    ->generateBatch(10);
+// Returns: ['TICKET001', 'TICKET002', ..., 'TICKET010']
+
+// Atomic and efficient
 ```

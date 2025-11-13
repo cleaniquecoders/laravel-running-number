@@ -4,6 +4,8 @@ use CleaniqueCoders\RunningNumber\Contracts\Generator;
 use CleaniqueCoders\RunningNumber\Enums\Organization;
 use CleaniqueCoders\RunningNumber\Exceptions\MaxNumberReachedException;
 use CleaniqueCoders\RunningNumber\Generator as RunningNumberGenerator;
+use CleaniqueCoders\RunningNumber\Presenters\CompactDatePresenter;
+use CleaniqueCoders\RunningNumber\Presenters\YearMonthPresenter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -849,4 +851,249 @@ it('validates max number is greater than starting number', function () {
             ->maxNumber(50)
             ->generate();
     })->toThrow(MaxNumberReachedException::class);
+});
+
+// Preview Mode Tests
+it('previews next number without incrementing', function () {
+    // Generate first number
+    $first = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->generate();
+
+    expect($first)->toBe('INVOICE001');
+
+    // Preview should show 002
+    $preview = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->preview();
+
+    expect($preview)->toBe('INVOICE002');
+
+    // Preview again - should still be 002
+    $preview2 = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->preview();
+
+    expect($preview2)->toBe('INVOICE002');
+
+    // Actually generate - should be 002
+    $second = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->generate();
+
+    expect($second)->toBe('INVOICE002');
+});
+
+it('preview works with scopes', function () {
+    RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->generate();
+
+    $preview = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->preview();
+
+    expect($preview)->toBe('INVOICE002');
+
+    // Different scope should preview 001
+    $previewWholesale = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->preview();
+
+    expect($previewWholesale)->toBe('INVOICE001');
+});
+
+it('preview accounts for pending resets', function () {
+    $model = config('running-number.model');
+
+    // Create record with daily reset from yesterday
+    $model::create([
+        'type' => 'TICKET',
+        'number' => 50,
+        'reset_period' => 'daily',
+        'last_reset_at' => now()->subDay(),
+    ]);
+
+    // Preview should show reset value (001)
+    $preview = RunningNumberGenerator::make()
+        ->type('ticket')
+        ->preview();
+
+    expect($preview)->toBe('TICKET001');
+});
+
+it('preview works with new types', function () {
+    // Preview on brand new type
+    $preview = RunningNumberGenerator::make()
+        ->type('order')
+        ->preview();
+
+    expect($preview)->toBe('ORDER001');
+
+    // Should still preview 001 (not generated yet)
+    $preview2 = RunningNumberGenerator::make()
+        ->type('order')
+        ->preview();
+
+    expect($preview2)->toBe('ORDER001');
+});
+
+it('preview works with date-based presenters', function () {
+    RunningNumberGenerator::make()
+        ->type('invoice')
+        ->formatter(new YearMonthPresenter)
+        ->generate();
+
+    $preview = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->formatter(new YearMonthPresenter)
+        ->preview();
+
+    $expected = 'INVOICE-'.date('Y').'-'.date('m').'-002';
+    expect($preview)->toBe($expected);
+});
+
+// Bulk Generation Tests
+it('generates multiple numbers at once', function () {
+    $numbers = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->generateBatch(5);
+
+    expect($numbers)->toHaveCount(5)
+        ->and($numbers[0])->toBe('INVOICE001')
+        ->and($numbers[1])->toBe('INVOICE002')
+        ->and($numbers[2])->toBe('INVOICE003')
+        ->and($numbers[3])->toBe('INVOICE004')
+        ->and($numbers[4])->toBe('INVOICE005');
+
+    // Verify database was updated correctly
+    $model = config('running-number.model');
+    $record = $model::where('type', 'INVOICE')->first();
+    expect($record->number)->toBe(5);
+});
+
+it('batch generation is atomic', function () {
+    // Generate batch
+    RunningNumberGenerator::make()
+        ->type('order')
+        ->generateBatch(10);
+
+    // Generate single
+    $number = RunningNumberGenerator::make()
+        ->type('order')
+        ->generate();
+
+    expect($number)->toBe('ORDER011');
+});
+
+it('batch generation works with scopes', function () {
+    $retail = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->generateBatch(3);
+
+    $wholesale = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->generateBatch(2);
+
+    expect($retail)->toHaveCount(3)
+        ->and($retail[0])->toBe('INVOICE001')
+        ->and($retail[2])->toBe('INVOICE003')
+        ->and($wholesale)->toHaveCount(2)
+        ->and($wholesale[0])->toBe('INVOICE001')
+        ->and($wholesale[1])->toBe('INVOICE002');
+});
+
+it('batch generation respects max number', function () {
+    // Should fail - trying to generate 10 but max is 5
+    expect(function () {
+        RunningNumberGenerator::make()
+            ->type('ticket')
+            ->maxNumber(5)
+            ->generateBatch(10);
+    })->toThrow(MaxNumberReachedException::class);
+
+    // Should succeed - exactly at limit
+    $numbers = RunningNumberGenerator::make()
+        ->type('receipt')
+        ->maxNumber(5)
+        ->generateBatch(5);
+
+    expect($numbers)->toHaveCount(5);
+
+    // Next batch should fail
+    expect(function () {
+        RunningNumberGenerator::make()
+            ->type('receipt')
+            ->maxNumber(5)
+            ->generateBatch(1);
+    })->toThrow(MaxNumberReachedException::class);
+});
+
+it('batch generation with custom starting number', function () {
+    $numbers = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->startFrom(100)
+        ->generateBatch(3);
+
+    expect($numbers[0])->toBe('INVOICE101')
+        ->and($numbers[1])->toBe('INVOICE102')
+        ->and($numbers[2])->toBe('INVOICE103');
+});
+
+it('returns empty array for zero or negative count', function () {
+    $zero = RunningNumberGenerator::make()
+        ->type('order')
+        ->generateBatch(0);
+
+    $negative = RunningNumberGenerator::make()
+        ->type('order')
+        ->generateBatch(-5);
+
+    expect($zero)->toBeArray()->toHaveCount(0)
+        ->and($negative)->toBeArray()->toHaveCount(0);
+
+    // Verify database wasn't touched (no record created for empty batch)
+    $model = config('running-number.model');
+    $count = $model::where('type', 'ORDER')->count();
+    expect($count)->toBe(0);
+});
+
+it('batch generation works with date presenters', function () {
+    $numbers = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->formatter(new CompactDatePresenter)
+        ->generateBatch(3);
+
+    expect($numbers)->toHaveCount(3);
+
+    $expectedPrefix = 'INVOICE-'.date('Ymd');
+    expect($numbers[0])->toBe($expectedPrefix.'001')
+        ->and($numbers[1])->toBe($expectedPrefix.'002')
+        ->and($numbers[2])->toBe($expectedPrefix.'003');
+});
+
+it('batch generation handles reset period', function () {
+    $model = config('running-number.model');
+
+    // Create with monthly reset from last month at number 50
+    $model::create([
+        'type' => 'MONTHLY',
+        'number' => 50,
+        'reset_period' => 'monthly',
+        'last_reset_at' => now()->subMonth(),
+    ]);
+
+    // Should reset and start from 1
+    $numbers = RunningNumberGenerator::make()
+        ->type('monthly')
+        ->generateBatch(3);
+
+    expect($numbers[0])->toBe('MONTHLY001')
+        ->and($numbers[1])->toBe('MONTHLY002')
+        ->and($numbers[2])->toBe('MONTHLY003');
 });

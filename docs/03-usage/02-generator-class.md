@@ -103,6 +103,27 @@ Generate the running number:
 $number = $generator->generate();
 ```
 
+### `preview()`
+
+Preview the next number without incrementing:
+
+```php
+$preview = $generator->preview();
+```
+
+See [Preview & Bulk Generation](../04-advanced-features/05-preview-and-batch.md#preview-mode) for details.
+
+### `generateBatch(int $count)`
+
+Generate multiple numbers at once:
+
+```php
+$numbers = $generator->generateBatch(10);
+// Returns array of 10 numbers
+```
+
+See [Preview & Bulk Generation](../04-advanced-features/05-preview-and-batch.md#bulk-generation) for details.
+
 ## Usage Patterns
 
 ### Fluent Interface

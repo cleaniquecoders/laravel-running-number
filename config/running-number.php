@@ -2,6 +2,9 @@
 
 use CleaniqueCoders\RunningNumber\Enums\Organization;
 use CleaniqueCoders\RunningNumber\Enums\ResetPeriod;
+use CleaniqueCoders\RunningNumber\Generator;
+use CleaniqueCoders\RunningNumber\Models\RunningNumber;
+use CleaniqueCoders\RunningNumber\Presenter;
 
 return [
     /*
@@ -21,7 +24,7 @@ return [
 
     'types' => Organization::values(),
 
-    'model' => \CleaniqueCoders\RunningNumber\Models\RunningNumber::class,
+    'model' => RunningNumber::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +36,7 @@ return [
     |
     */
 
-    'generator' => \CleaniqueCoders\RunningNumber\Generator::class,
+    'generator' => Generator::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -45,7 +48,7 @@ return [
     |
     */
 
-    'presenter' => \CleaniqueCoders\RunningNumber\Presenter::class,
+    'presenter' => Presenter::class,
 
     /*
     |--------------------------------------------------------------------------

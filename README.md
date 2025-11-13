@@ -18,12 +18,14 @@ Generate sequential running numbers for your Laravel application. Perfect for in
 - 🎯 **Custom Starting Numbers** - Start sequences from any number
 - 📊 **Range Management** - Set maximum limits with exception handling
 - 📅 **Date-Based Formats** - Built-in date presenters for time-organized numbers
+- 👁️ **Preview Mode** - Preview next numbers without incrementing
+- 📦 **Bulk Generation** - Generate multiple numbers at once atomically
 - ⚙️ **Configurable** - Customize padding, formatting, and behavior
 - 🆔 **UUID Support** - Built-in UUID support for running number records
 - 🏷️ **Native PHP Enums** - Modern PHP 8.1+ enum support with Traitify
 - 🔧 **Extensible** - Custom generators and presenters via contracts
 - 🚀 **Developer Friendly** - Helper functions, facades, and excellent IDE support
-- ✅ **Well Tested** - 51 tests with 124 assertions
+- ✅ **Well Tested** - 64 tests with 166 assertions
 - 📦 **Wide Compatibility** - Laravel 9-12 & PHP 8.1-8.4
 
 ## 📦 Installation
@@ -129,6 +131,7 @@ Comprehensive documentation is available in the [docs](docs/) directory:
 - [Multiple Sequences](docs/04-advanced-features/02-multiple-sequences.md)
 - [Custom Starting Numbers](docs/04-advanced-features/03-custom-starting-numbers.md)
 - [Number Range Management](docs/04-advanced-features/04-number-range-management.md)
+- [Preview & Bulk Generation](docs/04-advanced-features/05-preview-and-batch.md)
 - [Upgrade Guide](docs/06-upgrade-guide.md)
 - [API Reference](docs/README.md)
 
