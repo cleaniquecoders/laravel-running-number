@@ -13,3 +13,5 @@ vendor
 node_modules
 .php-cs-fixer.cache
 todo.md
+*.bak
+.phpunit.cache/
