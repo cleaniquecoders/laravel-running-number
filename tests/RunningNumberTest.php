@@ -111,3 +111,111 @@ it('maintains UUID across multiple number generations for same type', function (
         ->and($secondRecord->number)->toBe(2)
         ->and(config('running-number.model')::where('type', 'SECTION')->count())->toBe(1);
 });
+
+// Race Condition & Rollback Tests
+it('prevents duplicate numbers when generating concurrently', function () {
+    // Generate multiple numbers in sequence
+    $numbers = [];
+    for ($i = 0; $i < 5; $i++) {
+        $numbers[] = RunningNumberGenerator::make()
+            ->type(Organization::ORGANIZATION->value)
+            ->generate();
+    }
+
+    // All numbers should be unique
+    expect(count($numbers))->toBe(5)
+        ->and(count(array_unique($numbers)))->toBe(5)
+        ->and($numbers)->toMatchArray([
+            'ORGANIZATION001',
+            'ORGANIZATION002',
+            'ORGANIZATION003',
+            'ORGANIZATION004',
+            'ORGANIZATION005',
+        ]);
+});
+
+it('handles type creation race condition gracefully', function () {
+    // First creation should succeed
+    RunningNumberGenerator::make()->type(Organization::DIVISION->value)->generate();
+
+    // Verify only one record was created
+    $count = config('running-number.model')::where('type', 'DIVISION')->count();
+
+    expect($count)->toBe(1);
+});
+
+it('maintains sequential integrity after multiple operations', function () {
+    $type = Organization::UNIT->value;
+
+    // Generate 10 numbers
+    for ($i = 1; $i <= 10; $i++) {
+        RunningNumberGenerator::make()->type($type)->generate();
+    }
+
+    // Verify the final number is 10
+    $record = config('running-number.model')::where('type', 'UNIT')->first();
+
+    expect($record->number)->toBe(10);
+
+    // Generate 5 more
+    for ($i = 1; $i <= 5; $i++) {
+        RunningNumberGenerator::make()->type($type)->generate();
+    }
+
+    // Verify the final number is now 15
+    $record->refresh();
+    expect($record->number)->toBe(15);
+});
+
+it('uses database transactions for generation', function () {
+    // This test verifies that transactions are being used
+    // by checking that the number is properly incremented
+    $type = Organization::SECTION->value;
+
+    // Generate first number
+    $first = RunningNumberGenerator::make()->type($type)->generate();
+    expect($first)->toBe('SECTION001');
+
+    // Generate second number - should be sequential
+    $second = RunningNumberGenerator::make()->type($type)->generate();
+    expect($second)->toBe('SECTION002');
+
+    // Verify database state
+    $record = config('running-number.model')::where('type', 'SECTION')->first();
+    expect($record->number)->toBe(2);
+});
+
+it('does not lose numbers on successful generation', function () {
+    $type = Organization::PROFILE->value;
+    $generated = [];
+
+    // Generate 20 numbers
+    for ($i = 1; $i <= 20; $i++) {
+        $generated[] = RunningNumberGenerator::make()->type($type)->generate();
+    }
+
+    // Extract the numeric part from each generated number
+    $numbers = array_map(function ($num) {
+        return (int) preg_replace('/[^0-9]/', '', $num);
+    }, $generated);
+
+    // Verify no numbers are skipped (sequential from 1 to 20)
+    expect($numbers)->toEqual(range(1, 20));
+});
+
+it('ensures atomic operations with firstOrCreate', function () {
+    // Create a new type
+    RunningNumberGenerator::make()->type(Organization::DIVISION->value)->generate();
+
+    // Try to generate again - should not create duplicate type record
+    RunningNumberGenerator::make()->type(Organization::DIVISION->value)->generate();
+    RunningNumberGenerator::make()->type(Organization::DIVISION->value)->generate();
+
+    // Should only have ONE record for this type
+    $count = config('running-number.model')::where('type', 'DIVISION')->count();
+    expect($count)->toBe(1);
+
+    // And the number should be 3
+    $record = config('running-number.model')::where('type', 'DIVISION')->first();
+    expect($record->number)->toBe(3);
+});

@@ -5,6 +5,7 @@ namespace CleaniqueCoders\RunningNumber;
 use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
 use CleaniqueCoders\RunningNumber\Contracts\Presenter;
 use CleaniqueCoders\RunningNumber\Exceptions\InvalidRunningNumberTypeException;
+use Illuminate\Support\Facades\DB;
 
 class Generator implements GeneratorContract
 {
@@ -53,14 +54,21 @@ class Generator implements GeneratorContract
             throw new InvalidRunningNumberTypeException('Unsupported '.$this->type);
         }
 
-        $this->createRunningNumberTypeIfNotExists();
+        return DB::transaction(function () {
+            $this->createRunningNumberTypeIfNotExists();
 
-        $running_number = config('running-number.model')::where('type', $this->getType())->first();
-        $running_number->increment('number');
-        $running_number->save();
-        $running_number->refresh();
+            // Use lockForUpdate() to prevent race conditions
+            // This locks the row until the transaction is committed
+            $running_number = config('running-number.model')::where('type', $this->getType())
+                ->lockForUpdate()
+                ->first();
 
-        return $this->presenter->format($this->getType(), $running_number->number);
+            // Increment and save atomically within the transaction
+            $running_number->increment('number');
+            $running_number->refresh();
+
+            return $this->presenter->format($this->getType(), $running_number->number);
+        });
     }
 
     private function getType()
@@ -70,8 +78,11 @@ class Generator implements GeneratorContract
 
     private function createRunningNumberTypeIfNotExists()
     {
-        if (! config('running-number.model')::where('type', $this->getType())->exists()) {
-            config('running-number.model')::create(['type' => $this->getType()]);
-        }
+        // Use firstOrCreate() which is atomic and prevents race conditions
+        // Multiple concurrent requests will not create duplicate types
+        config('running-number.model')::firstOrCreate(
+            ['type' => $this->getType()],
+            ['number' => 0]
+        );
     }
 }
