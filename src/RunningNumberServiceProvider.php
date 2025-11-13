@@ -2,6 +2,8 @@
 
 namespace CleaniqueCoders\RunningNumber;
 
+use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
+use CleaniqueCoders\RunningNumber\Contracts\Presenter as PresenterContract;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -21,5 +23,40 @@ class RunningNumberServiceProvider extends PackageServiceProvider
             ->hasMigration('add_uuid_to_running_numbers_table')
             ->hasMigration('add_reset_functionality_to_running_numbers_table')
             ->hasMigration('add_scope_to_running_numbers_table');
+    }
+
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        parent::register();
+
+        // Register Generator contract binding
+        $this->app->bind(GeneratorContract::class, function ($app) {
+            $generatorClass = config('running-number.generator', Generator::class);
+
+            return new $generatorClass;
+        });
+
+        // Register Presenter contract binding
+        $this->app->bind(PresenterContract::class, function ($app) {
+            $presenterClass = config('running-number.presenter', Presenter::class);
+
+            return new $presenterClass;
+        });
+
+        // Register singleton for Generator (optional, for shared instance)
+        $this->app->singleton('running-number', function ($app) {
+            return $app->make(GeneratorContract::class);
+        });
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        parent::boot();
     }
 }
