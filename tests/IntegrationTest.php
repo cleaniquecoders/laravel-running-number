@@ -1,12 +1,9 @@
 <?php
 
 use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
-use CleaniqueCoders\RunningNumber\Enums\Organization;
 use CleaniqueCoders\RunningNumber\Generator as RunningNumberGenerator;
 use CleaniqueCoders\RunningNumber\Models\RunningNumber;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 
@@ -82,7 +79,8 @@ describe('Service Container Binding', function () {
     });
 
     it('can inject Generator in constructor', function () {
-        $service = new class(app(GeneratorContract::class)) {
+        $service = new class(app(GeneratorContract::class))
+        {
             public function __construct(public GeneratorContract $generator) {}
         };
 
@@ -111,14 +109,17 @@ describe('Service Container Binding', function () {
 describe('Model Observer Integration', function () {
     it('can generate running number in model observer', function () {
         // Create a test model with observer
-        $model = new class extends \Illuminate\Database\Eloquent\Model {
+        $model = new class extends \Illuminate\Database\Eloquent\Model
+        {
             protected $table = 'test_models';
+
             protected $fillable = ['name', 'reference_number'];
+
             public $timestamps = false;
 
             protected static function booted()
             {
-                static::creating(function ($model) {
+                self::creating(function ($model) {
                     if (empty($model->reference_number)) {
                         $model->reference_number = running_number()
                             ->type('test')
@@ -156,14 +157,17 @@ describe('Model Observer Integration', function () {
             $table->string('invoice_number');
         });
 
-        $invoiceModel = new class extends \Illuminate\Database\Eloquent\Model {
+        $invoiceModel = new class extends \Illuminate\Database\Eloquent\Model
+        {
             protected $table = 'invoices';
+
             protected $fillable = ['invoice_number'];
+
             public $timestamps = false;
 
             protected static function booted()
             {
-                static::creating(function ($model) {
+                self::creating(function ($model) {
                     $model->invoice_number = running_number()
                         ->type('invoice')
                         ->generate();
@@ -190,7 +194,8 @@ describe('Queue Job Integration', function () {
     it('generates unique numbers in queued jobs', function () {
         Queue::fake();
 
-        $job = new class {
+        $job = new class
+        {
             public function handle()
             {
                 return running_number()
@@ -210,7 +215,8 @@ describe('Queue Job Integration', function () {
 
         // Simulate multiple queue workers processing jobs
         for ($i = 0; $i < 5; $i++) {
-            $job = new class {
+            $job = new class
+            {
                 public function handle()
                 {
                     return running_number()
@@ -232,7 +238,8 @@ describe('Queue Job Integration', function () {
 describe('API Request Integration', function () {
     it('generates running number in API endpoint', function () {
         // Simulate API controller method
-        $controller = new class {
+        $controller = new class
+        {
             public function store()
             {
                 $orderNumber = running_number()
@@ -254,7 +261,8 @@ describe('API Request Integration', function () {
     });
 
     it('handles multiple concurrent API requests', function () {
-        $controller = new class {
+        $controller = new class
+        {
             public function store()
             {
                 return running_number()
@@ -387,13 +395,15 @@ describe('Real-world Scenario: Invoice Generation', function () {
         });
 
         // Invoice model with running number
-        $invoiceModel = new class extends \Illuminate\Database\Eloquent\Model {
+        $invoiceModel = new class extends \Illuminate\Database\Eloquent\Model
+        {
             protected $table = 'invoices';
+
             protected $fillable = ['invoice_number', 'customer_name', 'amount', 'status'];
 
             protected static function booted()
             {
-                static::creating(function ($model) {
+                self::creating(function ($model) {
                     $model->invoice_number = running_number()
                         ->type('invoice')
                         ->generate();
