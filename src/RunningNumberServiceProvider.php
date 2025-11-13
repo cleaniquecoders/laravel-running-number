@@ -66,5 +66,18 @@ class RunningNumberServiceProvider extends PackageServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        // Register API routes if enabled
+        if (config('running-number.api.enabled', false)) {
+            $this->registerRoutes();
+        }
+    }
+
+    /**
+     * Register API routes
+     */
+    protected function registerRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
     }
 }

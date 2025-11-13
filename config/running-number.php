@@ -88,4 +88,29 @@ return [
         //     'ticket' => ResetPeriod::DAILY->value,
         // ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure the REST API endpoints for generating and checking running
+    | numbers via HTTP. Set 'enabled' to true to activate the API routes.
+    |
+    */
+
+    'api' => [
+        // Enable or disable API routes
+        'enabled' => env('RUNNING_NUMBER_API_ENABLED', false),
+
+        // API route prefix (default: api/running-numbers)
+        'prefix' => env('RUNNING_NUMBER_API_PREFIX', 'api/running-numbers'),
+
+        // API middleware
+        'middleware' => ['api'],
+
+        // Optional authentication middleware
+        // Uncomment to require authentication for API endpoints
+        // 'middleware' => ['api', 'auth:sanctum'],
+    ],
 ];
