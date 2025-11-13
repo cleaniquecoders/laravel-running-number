@@ -3,7 +3,8 @@
     "allow": [
       "Bash(composer require:*)",
       "Bash(composer update:*)",
-      "Bash(composer test:*)"
+      "Bash(composer test:*)",
+      "Bash(composer analyse:*)"
     ],
     "deny": [],
     "ask": []
