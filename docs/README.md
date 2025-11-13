@@ -28,8 +28,10 @@ Practical examples and common usage patterns.
 - **[Helper Functions](03-usage/01-helper-functions.md)** - Using the global helper function
 - **[Generator Class](03-usage/02-generator-class.md)** - Direct generator instantiation and usage
 - **[Facade](03-usage/03-facade.md)** - Using the RunningNumber facade
-- **[Model Integration](03-usage/04-model-integration.md)** - Integrating with Eloquent models
+- **[Model Integration](03-usage/04-model-integration.md)** - Integrating with Eloquent models using the trait
 - **[Common Scenarios](03-usage/05-common-scenarios.md)** - Real-world implementation examples
+- **[Artisan Commands](03-usage/06-artisan-commands.md)** - Managing running numbers via CLI
+- **[Events](03-usage/07-events.md)** - Listening to generation events for auditing and logging
 
 ### [04. Features](04-features/)
 
@@ -100,10 +102,13 @@ Complete upgrade guide for all versions.
 - **Number Range Management**: Define min/max limits with validation
 - **Preview Mode**: Preview next numbers without incrementing counters
 - **Bulk Generation**: Generate multiple numbers atomically
+- **Eloquent Trait**: Auto-generate numbers on model creation with InteractsWithRunningNumber
+- **Artisan Commands**: CLI commands for managing, listing, resetting, and creating running numbers
+- **Event System**: Built-in events for auditing, logging, and notifications
 - **Highly Configurable**: Customize padding, formatting, and behavior
 - **Extensible Architecture**: Custom generators and presenters via contracts
-- **Developer Friendly**: Helper functions, facades, service container integration, and excellent IDE support
-- **Comprehensively Tested**: 108 tests, 265 assertions, PHPStan Level 5, 100% type coverage
+- **Developer Friendly**: Helper functions, facades, trait, commands, events, and excellent IDE support
+- **Comprehensively Tested**: 128 tests, 315 assertions, PHPStan Level 5, 100% type coverage
 - **Laravel 9-12**: Full support for Laravel 9.x, 10.x, 11.x, and 12.x
 - **PHP 8.1-8.4**: Supports PHP 8.1, 8.2, 8.3, and 8.4
 - **Production Ready**: Battle-tested for high-concurrency enterprise applications
@@ -198,6 +203,61 @@ $numbers = running_number()
 // Output: ['VOUCHER001', 'VOUCHER002', ..., 'VOUCHER010']
 ```
 
+### Using the Eloquent Trait
+
+```php
+use CleaniqueCoders\RunningNumber\Concerns\InteractsWithRunningNumber;
+use Illuminate\Database\Eloquent\Model;
+
+class Invoice extends Model
+{
+    use InteractsWithRunningNumber;
+
+    protected $fillable = ['invoice_number', 'customer_id', 'amount'];
+
+    // Configure automatic generation
+    protected string $runningNumberField = 'invoice_number';
+    protected string $runningNumberType = 'invoice';
+    protected ?string $runningNumberScope = '$customer_id'; // Dynamic scope
+}
+
+// Numbers auto-generate on creation
+$invoice = Invoice::create([
+    'customer_id' => 1,
+    'amount' => 1500.00,
+]);
+// invoice_number auto-set: INVOICE001
+```
+
+### Using Artisan Commands
+
+```bash
+# List all running numbers
+php artisan running-number:list
+
+# Create a new type
+php artisan running-number:create invoice --start=1000 --reset=monthly
+
+# Reset a type to zero
+php artisan running-number:reset invoice --force
+```
+
+### Listening to Events
+
+```php
+use CleaniqueCoders\RunningNumber\Events\RunningNumberGenerated;
+use Illuminate\Support\Facades\Event;
+
+Event::listen(RunningNumberGenerated::class, function ($event) {
+    // Log all generated numbers for auditing
+    logger()->info("Generated: {$event->formattedNumber}", [
+        'type' => $event->type,
+        'scope' => $event->scope,
+        'uuid' => $event->model->uuid,
+    ]);
+});
+```
+
 ### Service Container Integration
 
 ```php
@@ -249,13 +309,14 @@ DB::transaction(function () {
 
 ## 📊 Package Statistics
 
-- **Total Tests**: 108 tests with 265 assertions
+- **Total Tests**: 128 tests with 315 assertions
 - **Code Quality**: PHPStan Level 5 with 0 errors
 - **Type Coverage**: 100% type hints on all methods
 - **Test Coverage**: Comprehensive coverage including edge cases and concurrency tests
 - **Laravel Support**: 9.x, 10.x, 11.x, 12.x
 - **PHP Support**: 8.1, 8.2, 8.3, 8.4
-- **Documentation**: 30+ pages of comprehensive guides with real-world examples
+- **Documentation**: 35+ pages of comprehensive guides with real-world examples
+- **New Features**: Eloquent trait, 3 Artisan commands, Event system
 
 ## 🆘 Getting Help
 

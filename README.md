@@ -24,8 +24,8 @@ Generate sequential running numbers for your Laravel application. Perfect for in
 - 🆔 **UUID Support** - Built-in UUID support for running number records
 - 🏷️ **Native PHP Enums** - Modern PHP 8.1+ enum support with Traitify
 - 🔧 **Extensible** - Custom generators and presenters via contracts
-- 🚀 **Developer Friendly** - Helper functions, facades, and excellent IDE support
-- ✅ **Well Tested** - 64 tests with 166 assertions
+- 🚀 **Developer Friendly** - Helper functions, facades, Eloquent trait, and Artisan commands
+- 🎭 **Event System** - Built-in events for auditing and notifications
 - 📦 **Wide Compatibility** - Laravel 9-12 & PHP 8.1-8.4
 
 ## 📦 Installation

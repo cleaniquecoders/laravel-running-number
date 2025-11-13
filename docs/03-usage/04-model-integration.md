@@ -2,11 +2,121 @@
 
 Learn how to integrate running numbers seamlessly with your Eloquent models.
 
-## Basic Integration
+## Using the InteractsWithRunningNumber Trait
 
-### Using Model Events
+The easiest way to add automatic running number generation is using the `InteractsWithRunningNumber` trait:
 
-The most common approach is to generate running numbers in model events:
+```php
+use CleaniqueCoders\RunningNumber\Concerns\InteractsWithRunningNumber;
+use Illuminate\Database\Eloquent\Model;
+
+class Invoice extends Model
+{
+    use InteractsWithRunningNumber;
+
+    protected $fillable = ['invoice_number', 'customer_id', 'amount'];
+
+    // Configuration properties
+    protected string $runningNumberField = 'invoice_number';
+    protected string $runningNumberType = 'invoice';
+}
+```
+
+That's it! Every new invoice will automatically get a sequential number:
+
+```php
+$invoice = Invoice::create([
+    'customer_id' => 1,
+    'amount' => 100.00,
+]);
+
+echo $invoice->invoice_number; // INVOICE001
+```
+
+### Trait Configuration
+
+Configure the trait behavior using protected properties:
+
+```php
+class Order extends Model
+{
+    use InteractsWithRunningNumber;
+
+    // Required: Field to store the running number
+    protected string $runningNumberField = 'order_number';
+
+    // Required: Type identifier for the sequence
+    protected string $runningNumberType = 'order';
+
+    // Optional: Scope for multiple sequences
+    protected ?string $runningNumberScope = null;
+
+    // Optional: Starting number (default: 0)
+    protected ?int $runningNumberStart = 1000;
+
+    // Optional: Maximum number limit
+    protected ?int $runningNumberMax = 9999;
+
+    // Optional: Custom presenter class
+    protected ?string $runningNumberPresenter = null;
+}
+```
+
+### Dynamic Scope from Model Attributes
+
+You can use model attributes for dynamic scoping:
+
+```php
+class Order extends Model
+{
+    use InteractsWithRunningNumber;
+
+    protected string $runningNumberField = 'order_number';
+    protected string $runningNumberType = 'order';
+
+    // Use $ prefix to reference model attributes
+    protected ?string $runningNumberScope = '$store_id';
+}
+```
+
+Now each store gets its own sequence:
+
+```php
+// Store 1 orders: ORDER001, ORDER002, ORDER003
+$order1 = Order::create(['store_id' => 1]);
+$order2 = Order::create(['store_id' => 1]);
+
+// Store 2 orders: ORDER001, ORDER002
+$order3 = Order::create(['store_id' => 2]);
+```
+
+### Preview Next Number
+
+Preview the next number without generating it:
+
+```php
+$invoice = new Invoice();
+$nextNumber = $invoice->previewRunningNumber();
+
+echo $nextNumber; // INVOICE001
+```
+
+### Skip Generation
+
+The trait automatically skips generation if the field already has a value:
+
+```php
+// Will NOT generate a number (uses provided value)
+$invoice = Invoice::create([
+    'invoice_number' => 'CUSTOM-001',
+    'customer_id' => 1,
+    'amount' => 100.00,
+]);
+```
+
+## Manual Integration Using Model Events
+
+If you need more control, use model events directly:
 
 ```php
 use Illuminate\Database\Eloquent\Model;

@@ -5,6 +5,7 @@ namespace CleaniqueCoders\RunningNumber;
 use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
 use CleaniqueCoders\RunningNumber\Contracts\Presenter;
 use CleaniqueCoders\RunningNumber\Enums\ResetPeriod;
+use CleaniqueCoders\RunningNumber\Events\RunningNumberGenerated;
 use CleaniqueCoders\RunningNumber\Exceptions\ConfigurationException;
 use CleaniqueCoders\RunningNumber\Exceptions\InvalidRunningNumberTypeException;
 use CleaniqueCoders\RunningNumber\Exceptions\MaxNumberReachedException;
@@ -328,7 +329,17 @@ class Generator implements GeneratorContract
             $running_number->increment('number');
             $running_number->refresh();
 
-            return $this->presenter->format($this->getType(), $running_number->number);
+            $formattedNumber = $this->presenter->format($this->getType(), $running_number->number);
+
+            // Dispatch event after successful generation
+            event(new RunningNumberGenerated(
+                $this->getType(),
+                $formattedNumber,
+                $running_number,
+                $this->scope
+            ));
+
+            return $formattedNumber;
         });
     }
 

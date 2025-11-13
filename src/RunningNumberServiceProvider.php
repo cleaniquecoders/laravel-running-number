@@ -2,6 +2,9 @@
 
 namespace CleaniqueCoders\RunningNumber;
 
+use CleaniqueCoders\RunningNumber\Console\Commands\CreateRunningNumberCommand;
+use CleaniqueCoders\RunningNumber\Console\Commands\ListRunningNumbersCommand;
+use CleaniqueCoders\RunningNumber\Console\Commands\ResetRunningNumberCommand;
 use CleaniqueCoders\RunningNumber\Contracts\Generator as GeneratorContract;
 use CleaniqueCoders\RunningNumber\Contracts\Presenter as PresenterContract;
 use Spatie\LaravelPackageTools\Package;
@@ -22,7 +25,12 @@ class RunningNumberServiceProvider extends PackageServiceProvider
             ->hasMigration('create_running_number_table')
             ->hasMigration('add_uuid_to_running_numbers_table')
             ->hasMigration('add_reset_functionality_to_running_numbers_table')
-            ->hasMigration('add_scope_to_running_numbers_table');
+            ->hasMigration('add_scope_to_running_numbers_table')
+            ->hasCommands([
+                ListRunningNumbersCommand::class,
+                ResetRunningNumberCommand::class,
+                CreateRunningNumberCommand::class,
+            ]);
     }
 
     /**

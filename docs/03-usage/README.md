@@ -7,8 +7,10 @@ Learn how to use Laravel Running Number in your Laravel application with practic
 1. [Helper Functions](01-helper-functions.md) - Using the `running_number()` helper
 2. [Generator Class](02-generator-class.md) - Direct usage of the Generator class
 3. [Facade](03-facade.md) - Using the RunningNumber facade
-4. [Model Integration](04-model-integration.md) - Integrating with Eloquent models
+4. [Model Integration](04-model-integration.md) - Integrating with Eloquent models (includes InteractsWithRunningNumber trait)
 5. [Common Scenarios](05-common-scenarios.md) - Real-world usage examples
+6. [Artisan Commands](06-artisan-commands.md) - Managing running numbers via CLI
+7. [Events](07-events.md) - Listening to running number generation events
 
 ## Quick Examples
 
