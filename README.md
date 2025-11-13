@@ -1,8 +1,9 @@
 # Laravel Running Number
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/cleaniquecoders/laravel-running-number.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/laravel-running-number)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/cleaniquecoders/laravel-running-number/run-tests?label=tests)](https://github.com/cleaniquecoders/laravel-running-number/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/cleaniquecoders/laravel-running-number/Check%20&%20fix%20styling?label=code%20style)](https://github.com/cleaniquecoders/laravel-running-number/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/laravel-running-number/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/cleaniquecoders/laravel-running-number/actions/workflows/run-tests.yml)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/laravel-running-number/fix-styling.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/cleaniquecoders/laravel-running-number/actions/workflows/fix-styling.yml)
+[![PHPStan Analysis](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/laravel-running-number/phpstan.yml?branch=main&label=phpstan&style=flat-square)](https://github.com/cleaniquecoders/laravel-running-number/actions/workflows/phpstan.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/cleaniquecoders/laravel-running-number.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/laravel-running-number)
 
 Generate sequential running numbers for your Laravel application. Perfect for invoice numbers, order numbers, customer IDs, and any other sequential identifiers you need.
