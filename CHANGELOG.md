@@ -2,6 +2,60 @@
 
 All notable changes to `laravel-running-number` will be documented in this file.
 
+## v3.0.0 - Major Feature Release (Planned)
+
+Version 3.0.0 represents a major advancement in the package, implementing comprehensive feature enhancements and architectural improvements.
+
+### 🚀 Major Features
+
+#### Traitify Integration
+- **Native PHP Enums Support** - Migrated from `spatie/laravel-enum` to native PHP 8.1+ enums with `cleaniquecoders/traitify`
+- **UUID Support** - Full UUID support via `InteractsWithUuid` trait
+- **Enum Methods** - Enhanced enum capabilities with `values()`, `labels()`, `options()`, `descriptions()`
+
+#### Running Number Management
+- **Reset/Restart Functionality** - Reset running numbers or restart from custom starting points
+- **Date-Based Formats** - Generate numbers with configurable date components (e.g., `INV-2024-01-001`)
+- **Multiple Sequences** - Maintain separate sequences for the same type (branch-specific, department-specific)
+- **Custom Starting Numbers** - Configure custom starting numbers per type
+- **Range Management** - Define and enforce number ranges with overflow detection
+
+#### Generation Features
+- **Preview Mode** - Preview next number without persisting to database
+- **Bulk Generation** - Efficiently generate multiple numbers in a single operation
+- **Threading Safety** - Improved concurrency handling for high-volume generation
+- **Audit Trail** - Optional generation history tracking with user attribution
+
+#### Developer Experience
+- **Eloquent Trait** - New `HasRunningNumber` trait for seamless model integration
+- **Artisan Commands** - CLI commands for list, reset, restart, preview, and statistics
+- **Events System** - `RunningNumberGenerated` and `RunningNumberReset` events for extensibility
+- **Service Container Integration** - Enhanced dependency injection support
+
+### 📚 Documentation
+- Complete documentation overhaul with structured guides
+- 20+ dedicated documentation files organized in progressive learning path
+- Comprehensive examples for common scenarios
+- Advanced integration patterns guide
+- Developer contribution guidelines
+
+### ⚡ Breaking Changes
+
+**Enum Migration**: Updated from Spatie enums to native PHP enums with Traitify
+**Database Schema**: Added required `uuid` column to `running_numbers` table
+**Configuration**: Extended with new options for reset periods, date formats, starting numbers, and audit trail
+
+See the [Upgrade Guide](docs/06-upgrade-guide.md) for detailed migration instructions.
+
+### 📦 Dependencies
+- Added `cleaniquecoders/traitify` for UUID and enum support
+- Minimum PHP 8.1+ required
+- Laravel 9-12 supported
+
+**Full Documentation**: See [docs/06-upgrade-guide.md](docs/06-upgrade-guide.md) for complete v3.0.0 upgrade guide
+
+---
+
 ## Added Laravel 12 and PHP 8.4 Support - 2025-05-01
 
 ### What's Changed

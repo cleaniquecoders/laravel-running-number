@@ -18,13 +18,7 @@ return [
     |
     */
 
-    'types' => [
-        Organization::organization()->value,
-        Organization::division()->value,
-        Organization::section()->value,
-        Organization::unit()->value,
-        Organization::profile()->value,
-    ],
+    'types' => Organization::values(),
 
     'model' => \CleaniqueCoders\RunningNumber\Models\RunningNumber::class,
 
