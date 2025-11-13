@@ -38,12 +38,16 @@ $next = Generator::make()
 
 ### How It Works
 
-The `preview()` method:
-1. Reads the current counter state
-2. Accounts for pending resets
-3. Calculates what the next number would be
-4. Formats and returns it
-5. Does NOT increment the database counter
+The `preview()` method is **completely read-only**:
+
+1. Queries the database for existing record (no writes)
+2. If record doesn't exist, shows what first number would be based on `startFrom()`
+3. If record exists, reads current counter state
+4. Accounts for pending resets
+5. Calculates what the next number would be
+6. Formats and returns it
+7. **No database modifications** - No record creation, no transactions, no locks
+8. Pure read operation - safe to call anytime without side effects
 
 ### Use Cases
 
@@ -358,11 +362,14 @@ $next = Generator::make()
 
 ### Preview Mode
 
-1. **UI Displays**: Show users what their next number will be
-2. **Validation**: Validate forms with preview data
-3. **No Side Effects**: Preview doesn't affect the counter
-4. **Concurrent Safe**: Multiple previews don't interfere
-5. **Caching**: Cache preview results if needed
+1. **Completely Read-Only**: No database writes, no record creation, no transactions
+2. **UI Displays**: Show users what their next number will be
+3. **Validation**: Validate forms with preview data
+4. **No Side Effects**: Preview doesn't affect the counter or database state
+5. **Concurrent Safe**: Multiple previews don't interfere with each other
+6. **Performance**: Lightweight operation with no locking overhead
+7. **Caching**: Safe to cache preview results as they have no side effects
+8. **New Types**: Shows what first number would be for non-existent types
 
 ### Bulk Generation
 
