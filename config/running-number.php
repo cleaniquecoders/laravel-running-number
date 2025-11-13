@@ -1,6 +1,7 @@
 <?php
 
 use CleaniqueCoders\RunningNumber\Enums\Organization;
+use CleaniqueCoders\RunningNumber\Enums\ResetPeriod;
 
 return [
     /*
@@ -56,4 +57,32 @@ return [
     */
 
     'padding' => 3,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reset Period Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure when running numbers should automatically reset. You can set
+    | a global default reset period, or configure specific periods per type.
+    |
+    | Available periods: 'never', 'daily', 'monthly', 'yearly'
+    | - never: Running numbers never reset (default)
+    | - daily: Reset at midnight every day
+    | - monthly: Reset on the 1st of each month
+    | - yearly: Reset on January 1st each year
+    |
+    */
+
+    'reset_period' => [
+        'default' => ResetPeriod::NEVER->value,
+
+        // Per-type reset periods (optional)
+        // Uncomment and configure specific types as needed
+        // 'types' => [
+        //     'invoice' => ResetPeriod::YEARLY->value,
+        //     'receipt' => ResetPeriod::MONTHLY->value,
+        //     'ticket' => ResetPeriod::DAILY->value,
+        // ],
+    ],
 ];

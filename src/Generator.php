@@ -63,6 +63,11 @@ class Generator implements GeneratorContract
                 ->lockForUpdate()
                 ->first();
 
+            // Check if reset is needed based on reset period
+            if ($running_number->needsReset()) {
+                $running_number->reset();
+            }
+
             // Increment and save atomically within the transaction
             $running_number->increment('number');
             $running_number->refresh();
@@ -80,9 +85,29 @@ class Generator implements GeneratorContract
     {
         // Use firstOrCreate() which is atomic and prevents race conditions
         // Multiple concurrent requests will not create duplicate types
+        $resetPeriod = $this->getResetPeriod();
+
         config('running-number.model')::firstOrCreate(
             ['type' => $this->getType()],
-            ['number' => 0]
+            [
+                'number' => 0,
+                'reset_period' => $resetPeriod,
+                'last_reset_at' => now(),
+            ]
         );
+    }
+
+    private function getResetPeriod(): string
+    {
+        // Check if there's a specific reset period for this type
+        $typeResetPeriods = config('running-number.reset_period.types', []);
+        $type = strtolower($this->type);
+
+        if (isset($typeResetPeriods[$type])) {
+            return $typeResetPeriods[$type];
+        }
+
+        // Fall back to default reset period
+        return config('running-number.reset_period.default', 'never');
     }
 }
