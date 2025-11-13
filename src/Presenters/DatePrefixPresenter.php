@@ -27,12 +27,12 @@ class DatePrefixPresenter implements Presenter
      *
      * @param  string  $type  The type of running number
      * @param  int  $number  The sequence number
-     * @return string Formatted running number
+     * @return string Formatted running number (e.g., "INVOICE-2025-11-13-001")
      */
-    public function format($type, $number): string
+    public function format(string $type, int $number): string
     {
-        $padding = config('running-number.padding', 3);
-        $paddedNumber = str_pad($number, $padding, '0', STR_PAD_LEFT);
+        $padding = (int) config('running-number.padding', 3);
+        $paddedNumber = str_pad((string) $number, $padding, '0', STR_PAD_LEFT);
         $datePrefix = date($this->dateFormat);
 
         return implode($this->separator, [

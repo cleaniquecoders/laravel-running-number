@@ -7,6 +7,10 @@ use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * Running Number Model
+ *
+ * @property int $id
+ * @property string $uuid
  * @property int $number
  * @property string $type
  * @property string|null $scope
@@ -14,6 +18,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $last_reset_at
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * @method bool increment(string $column, float|int $amount = 1, array $extra = [])
+ * @method $this refresh()
+ * @method bool save(array $options = [])
  */
 class RunningNumber extends Model
 {
@@ -21,6 +29,9 @@ class RunningNumber extends Model
 
     protected $guarded = [];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'reset_period' => ResetPeriod::class,
         'last_reset_at' => 'datetime',

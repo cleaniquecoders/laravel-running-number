@@ -30,10 +30,10 @@ class CompactDatePresenter implements Presenter
      * @param  int  $number  The sequence number
      * @return string Formatted running number
      */
-    public function format($type, $number): string
+    public function format(string $type, int $number): string
     {
-        $padding = config('running-number.padding', 3);
-        $paddedNumber = str_pad($number, $padding, '0', STR_PAD_LEFT);
+        $padding = (int) config('running-number.padding', 3);
+        $paddedNumber = str_pad((string) $number, $padding, '0', STR_PAD_LEFT);
         $datePrefix = date($this->dateFormat);
 
         return $type.$this->separator.$datePrefix.$paddedNumber;

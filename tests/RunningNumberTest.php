@@ -808,7 +808,7 @@ it('provides meaningful error message when max is reached', function () {
         // Should not reach here
         expect(false)->toBeTrue();
     } catch (MaxNumberReachedException $e) {
-        expect($e->getMessage())->toContain('Maximum number 2 reached for type TICKET');
+        expect($e->getMessage())->toContain('Maximum number 2 reached for running number type "TICKET"');
     }
 });
 
