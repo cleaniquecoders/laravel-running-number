@@ -17,12 +17,12 @@ class Generator implements GeneratorContract
     public function __construct()
     {
         $presenter = config('running-number.presenter');
-        $this->presenter = new $presenter();
+        $this->presenter = new $presenter;
     }
 
     public static function make(): GeneratorContract
     {
-        return new self();
+        return new self;
     }
 
     public function formatter(Presenter $presenter): GeneratorContract

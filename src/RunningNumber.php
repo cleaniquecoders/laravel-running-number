@@ -2,6 +2,4 @@
 
 namespace CleaniqueCoders\RunningNumber;
 
-class RunningNumber
-{
-}
+class RunningNumber {}

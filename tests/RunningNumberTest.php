@@ -11,7 +11,7 @@ beforeEach(function () {
     include_once __DIR__.'/../database/migrations/create_running_number_table.php.stub';
     include_once __DIR__.'/../database/migrations/add_uuid_to_running_numbers_table.php.stub';
 
-    (new \CreateRunningNumberTable())->up();
+    (new \CreateRunningNumberTable)->up();
 
     // Run the UUID migration
     $uuidMigration = new class extends \Illuminate\Database\Migrations\Migration
