@@ -2,6 +2,7 @@
 
 use CleaniqueCoders\RunningNumber\Contracts\Generator;
 use CleaniqueCoders\RunningNumber\Enums\Organization;
+use CleaniqueCoders\RunningNumber\Exceptions\MaxNumberReachedException;
 use CleaniqueCoders\RunningNumber\Generator as RunningNumberGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -11,6 +12,7 @@ beforeEach(function () {
     include_once __DIR__.'/../database/migrations/create_running_number_table.php.stub';
     include_once __DIR__.'/../database/migrations/add_uuid_to_running_numbers_table.php.stub';
     include_once __DIR__.'/../database/migrations/add_reset_functionality_to_running_numbers_table.php.stub';
+    include_once __DIR__.'/../database/migrations/add_scope_to_running_numbers_table.php.stub';
 
     (new \CreateRunningNumberTable)->up();
 
@@ -39,10 +41,23 @@ beforeEach(function () {
     };
     $resetMigration->up();
 
+    // Run the scope migration
+    $scopeMigration = new class extends \Illuminate\Database\Migrations\Migration
+    {
+        public function up()
+        {
+            Schema::table('running_numbers', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->string('scope')->nullable()->after('type');
+                $table->unique(['type', 'scope'], 'running_numbers_type_scope_unique');
+            });
+        }
+    };
+    $scopeMigration->up();
+
     // Add test-specific types to config
     config(['running-number.types' => array_merge(
         config('running-number.types'),
-        ['invoice', 'receipt', 'ticket', 'order', 'monthly']
+        ['invoice', 'receipt', 'ticket', 'order', 'monthly', 'adjustment', 'daily', 'test1', 'test2']
     )]);
 });
 
@@ -383,4 +398,455 @@ it('updates last_reset_at when reset occurs', function () {
 
     expect($record->number)->toBe(1)
         ->and($record->last_reset_at->isAfter($originalResetDate))->toBeTrue();
+});
+
+// Scope Tests - Multiple Sequences Per Type
+it('generates separate sequences for different scopes', function () {
+    // Generate numbers for retail scope
+    $retail1 = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->generate();
+
+    $retail2 = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->generate();
+
+    // Generate numbers for wholesale scope
+    $wholesale1 = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->generate();
+
+    $wholesale2 = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->generate();
+
+    // Both should start from 1 and increment independently
+    expect($retail1)->toBe('INVOICE001')
+        ->and($retail2)->toBe('INVOICE002')
+        ->and($wholesale1)->toBe('INVOICE001')
+        ->and($wholesale2)->toBe('INVOICE002');
+});
+
+it('maintains separate database records for different scopes', function () {
+    RunningNumberGenerator::make()->type('invoice')->scope('retail')->generate();
+    RunningNumberGenerator::make()->type('invoice')->scope('wholesale')->generate();
+
+    $model = config('running-number.model');
+
+    $retailRecord = $model::where('type', 'INVOICE')
+        ->where('scope', 'retail')
+        ->first();
+
+    $wholesaleRecord = $model::where('type', 'INVOICE')
+        ->where('scope', 'wholesale')
+        ->first();
+
+    expect($retailRecord)->not->toBeNull()
+        ->and($wholesaleRecord)->not->toBeNull()
+        ->and($retailRecord->id)->not->toBe($wholesaleRecord->id)
+        ->and($retailRecord->number)->toBe(1)
+        ->and($wholesaleRecord->number)->toBe(1);
+});
+
+it('generates separate sequence for null scope vs named scope', function () {
+    // Generate without scope (null)
+    $noScope1 = RunningNumberGenerator::make()->type('invoice')->generate();
+    $noScope2 = RunningNumberGenerator::make()->type('invoice')->generate();
+
+    // Generate with scope
+    $withScope1 = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('online')
+        ->generate();
+
+    expect($noScope1)->toBe('INVOICE001')
+        ->and($noScope2)->toBe('INVOICE002')
+        ->and($withScope1)->toBe('INVOICE001');
+
+    // Verify two separate records exist
+    $model = config('running-number.model');
+    $records = $model::where('type', 'INVOICE')->get();
+
+    expect($records->count())->toBe(2);
+});
+
+it('allows multiple scopes for the same type', function () {
+    $scopes = ['branch-a', 'branch-b', 'branch-c', 'online', 'retail'];
+
+    foreach ($scopes as $scope) {
+        for ($i = 1; $i <= 3; $i++) {
+            RunningNumberGenerator::make()
+                ->type('receipt')
+                ->scope($scope)
+                ->generate();
+        }
+    }
+
+    $model = config('running-number.model');
+    $records = $model::where('type', 'RECEIPT')->get();
+
+    // Should have 5 separate records, one for each scope
+    expect($records->count())->toBe(5);
+
+    // Each should have number = 3
+    foreach ($records as $record) {
+        expect($record->number)->toBe(3);
+    }
+});
+
+it('enforces unique constraint on type and scope combination', function () {
+    RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->generate();
+
+    // Trying to manually create duplicate should fail
+    $model = config('running-number.model');
+
+    expect(function () use ($model) {
+        $model::create([
+            'type' => 'INVOICE',
+            'scope' => 'retail',
+            'number' => 0,
+            'reset_period' => 'never',
+            'last_reset_at' => now(),
+        ]);
+    })->toThrow(\Illuminate\Database\QueryException::class);
+});
+
+it('handles scope with special characters', function () {
+    $scopes = [
+        'branch-01',
+        'branch_02',
+        'BRANCH-03',
+        'dept.sales',
+    ];
+
+    foreach ($scopes as $scope) {
+        $number = RunningNumberGenerator::make()
+            ->type('order')
+            ->scope($scope)
+            ->generate();
+
+        expect($number)->toBe('ORDER001');
+    }
+
+    $model = config('running-number.model');
+    $records = $model::where('type', 'ORDER')->get();
+
+    expect($records->count())->toBe(count($scopes));
+});
+
+it('maintains scope independence with reset periods', function () {
+    $model = config('running-number.model');
+
+    // Create two scoped records with monthly reset from last month
+    $retail = $model::create([
+        'type' => 'INVOICE',
+        'scope' => 'retail',
+        'number' => 100,
+        'reset_period' => 'monthly',
+        'last_reset_at' => now()->subMonth(),
+    ]);
+
+    $wholesale = $model::create([
+        'type' => 'INVOICE',
+        'scope' => 'wholesale',
+        'number' => 200,
+        'reset_period' => 'monthly',
+        'last_reset_at' => now()->subMonth(),
+    ]);
+
+    // Generate for retail - should reset
+    $retailNumber = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->generate();
+
+    // Generate for wholesale - should also reset
+    $wholesaleNumber = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->generate();
+
+    expect($retailNumber)->toBe('INVOICE001')
+        ->and($wholesaleNumber)->toBe('INVOICE001');
+
+    // Verify both were reset independently
+    $retail->refresh();
+    $wholesale->refresh();
+
+    expect($retail->number)->toBe(1)
+        ->and($wholesale->number)->toBe(1);
+});
+
+// Custom Starting Number Tests
+it('starts from custom number when creating new type', function () {
+    $number = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->startFrom(1000)
+        ->generate();
+
+    expect($number)->toBe('INVOICE1001');
+
+    $model = config('running-number.model');
+    $record = $model::where('type', 'INVOICE')->first();
+
+    expect($record->number)->toBe(1001);
+});
+
+it('starts from zero by default', function () {
+    $number = RunningNumberGenerator::make()
+        ->type('receipt')
+        ->generate();
+
+    expect($number)->toBe('RECEIPT001');
+});
+
+it('allows different starting numbers for different types', function () {
+    $invoice = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->startFrom(5000)
+        ->generate();
+
+    $receipt = RunningNumberGenerator::make()
+        ->type('receipt')
+        ->startFrom(2000)
+        ->generate();
+
+    expect($invoice)->toBe('INVOICE5001')
+        ->and($receipt)->toBe('RECEIPT2001');
+});
+
+it('ignores startFrom for existing types', function () {
+    // Create initial record
+    RunningNumberGenerator::make()
+        ->type('order')
+        ->startFrom(100)
+        ->generate();
+
+    // Try to set different startFrom - should be ignored
+    $number = RunningNumberGenerator::make()
+        ->type('order')
+        ->startFrom(5000)
+        ->generate();
+
+    // Should continue from 101, not jump to 5001
+    expect($number)->toBe('ORDER102');
+});
+
+it('works with scope and custom starting number', function () {
+    $retail = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('retail')
+        ->startFrom(1000)
+        ->generate();
+
+    $wholesale = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->startFrom(5000)
+        ->generate();
+
+    expect($retail)->toBe('INVOICE1001')
+        ->and($wholesale)->toBe('INVOICE5001');
+
+    $model = config('running-number.model');
+
+    $retailRecord = $model::where('type', 'INVOICE')
+        ->where('scope', 'retail')
+        ->first();
+
+    $wholesaleRecord = $model::where('type', 'INVOICE')
+        ->where('scope', 'wholesale')
+        ->first();
+
+    expect($retailRecord->number)->toBe(1001)
+        ->and($wholesaleRecord->number)->toBe(5001);
+});
+
+it('handles large starting numbers', function () {
+    $number = RunningNumberGenerator::make()
+        ->type('ticket')
+        ->startFrom(999999)
+        ->generate();
+
+    expect($number)->toBe('TICKET1000000');
+});
+
+it('can start from negative numbers', function () {
+    $number = RunningNumberGenerator::make()
+        ->type('adjustment')
+        ->startFrom(-10)
+        ->generate();
+
+    // Negative numbers increment: -10 -> -9
+    expect($number)->toBe('ADJUSTMENT0-9');
+});
+
+// Number Range Management Tests
+it('throws exception when max number is reached', function () {
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(5)
+        ->generate();
+
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(5)
+        ->generate();
+
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(5)
+        ->generate();
+
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(5)
+        ->generate();
+
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(5)
+        ->generate();
+
+    // 6th attempt should throw exception
+    expect(function () {
+        RunningNumberGenerator::make()
+            ->type('ticket')
+            ->maxNumber(5)
+            ->generate();
+    })->toThrow(MaxNumberReachedException::class);
+});
+
+it('allows generation without max number constraint', function () {
+    for ($i = 1; $i <= 100; $i++) {
+        $number = RunningNumberGenerator::make()
+            ->type('receipt')
+            ->generate();
+    }
+
+    expect($number)->toBe('RECEIPT100');
+});
+
+it('works with custom starting number and max number', function () {
+    // Start from 95, max at 100 - should allow 5 generations (96-100)
+    for ($i = 1; $i <= 5; $i++) {
+        $number = RunningNumberGenerator::make()
+            ->type('order')
+            ->startFrom(95)
+            ->maxNumber(100)
+            ->generate();
+    }
+
+    // Last successful generation should be ORDER100
+    expect($number)->toBe('ORDER100');
+
+    // 6th should fail (would be 101, exceeding max of 100)
+    expect(function () {
+        RunningNumberGenerator::make()
+            ->type('order')
+            ->startFrom(95)
+            ->maxNumber(100)
+            ->generate();
+    })->toThrow(MaxNumberReachedException::class);
+});
+
+it('max number works independently per scope', function () {
+    // Generate for retail scope up to max
+    for ($i = 1; $i <= 3; $i++) {
+        RunningNumberGenerator::make()
+            ->type('invoice')
+            ->scope('retail')
+            ->maxNumber(3)
+            ->generate();
+    }
+
+    // Should throw for retail
+    expect(function () {
+        RunningNumberGenerator::make()
+            ->type('invoice')
+            ->scope('retail')
+            ->maxNumber(3)
+            ->generate();
+    })->toThrow(MaxNumberReachedException::class);
+
+    // Should still work for wholesale scope
+    $number = RunningNumberGenerator::make()
+        ->type('invoice')
+        ->scope('wholesale')
+        ->maxNumber(3)
+        ->generate();
+
+    expect($number)->toBe('INVOICE001');
+});
+
+it('provides meaningful error message when max is reached', function () {
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(2)
+        ->generate();
+
+    RunningNumberGenerator::make()
+        ->type('ticket')
+        ->maxNumber(2)
+        ->generate();
+
+    try {
+        RunningNumberGenerator::make()
+            ->type('ticket')
+            ->maxNumber(2)
+            ->generate();
+
+        // Should not reach here
+        expect(false)->toBeTrue();
+    } catch (MaxNumberReachedException $e) {
+        expect($e->getMessage())->toContain('Maximum number 2 reached for type TICKET');
+    }
+});
+
+it('max number resets with reset period', function () {
+    $model = config('running-number.model');
+
+    // Create record with daily reset from yesterday, at max number
+    $model::create([
+        'type' => 'DAILY',
+        'number' => 10,
+        'reset_period' => 'daily',
+        'last_reset_at' => now()->subDay(),
+    ]);
+
+    // Should reset and allow generation even with max number
+    $number = RunningNumberGenerator::make()
+        ->type('daily')
+        ->maxNumber(10)
+        ->generate();
+
+    expect($number)->toBe('DAILY001');
+});
+
+it('validates max number is greater than starting number', function () {
+    // This should work - start at 10, max at 20
+    $number = RunningNumberGenerator::make()
+        ->type('test1')
+        ->startFrom(10)
+        ->maxNumber(20)
+        ->generate();
+
+    expect($number)->toBe('TEST1011');
+
+    // Start at 100, max at 50 - first generation creates 100, then increments to 101
+    // Since 100 >= 50 (max), it should throw immediately
+    expect(function () {
+        RunningNumberGenerator::make()
+            ->type('test2')
+            ->startFrom(100)
+            ->maxNumber(50)
+            ->generate();
+    })->toThrow(MaxNumberReachedException::class);
 });

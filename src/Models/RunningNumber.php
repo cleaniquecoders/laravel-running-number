@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int $number
  * @property string $type
+ * @property string|null $scope
  * @property ResetPeriod $reset_period
  * @property \Illuminate\Support\Carbon|null $last_reset_at
  * @property \Illuminate\Support\Carbon $created_at

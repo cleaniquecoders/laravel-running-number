@@ -65,6 +65,36 @@ use CleaniqueCoders\RunningNumber\Contracts\Presenter;
 $generator->formatter(new CustomPresenter());
 ```
 
+### `scope(?string $scope)`
+
+Set a scope for multiple sequences per type:
+
+```php
+$generator->scope('retail');
+```
+
+See [Multiple Sequences](../04-advanced-features/02-multiple-sequences.md) for details.
+
+### `startFrom(int $number)`
+
+Set a custom starting number:
+
+```php
+$generator->startFrom(1000);
+```
+
+See [Custom Starting Numbers](../04-advanced-features/03-custom-starting-numbers.md) for details.
+
+### `maxNumber(int $number)`
+
+Set a maximum number limit:
+
+```php
+$generator->maxNumber(9999);
+```
+
+See [Number Range Management](../04-advanced-features/04-number-range-management.md) for details.
+
 ### `generate()`
 
 Generate the running number:
@@ -84,6 +114,22 @@ $number = Generator::make()
     ->type('invoice')
     ->toUpperCase(true)
     ->generate();
+```
+
+### With Advanced Features
+
+```php
+use CleaniqueCoders\RunningNumber\Generator;
+use CleaniqueCoders\RunningNumber\Presenters\YearMonthPresenter;
+
+$number = Generator::make()
+    ->type('invoice')
+    ->scope('retail')
+    ->startFrom(1000)
+    ->maxNumber(9999)
+    ->formatter(new YearMonthPresenter())
+    ->generate();
+// Output: INVOICE-2025-11-1001
 ```
 
 ### Reusable Instance

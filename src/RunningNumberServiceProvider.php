@@ -19,6 +19,7 @@ class RunningNumberServiceProvider extends PackageServiceProvider
             ->hasConfigFile('running-number')
             ->hasMigration('create_running_number_table')
             ->hasMigration('add_uuid_to_running_numbers_table')
-            ->hasMigration('add_reset_functionality_to_running_numbers_table');
+            ->hasMigration('add_reset_functionality_to_running_numbers_table')
+            ->hasMigration('add_scope_to_running_numbers_table');
     }
 }

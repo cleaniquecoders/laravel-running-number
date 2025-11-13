@@ -42,7 +42,7 @@ enum ResetPeriod: string
             return false;
         }
 
-        $now = new \DateTime();
+        $now = new \DateTime;
 
         return match ($this) {
             self::NEVER => false,

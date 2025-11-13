@@ -12,12 +12,18 @@ Generate sequential running numbers for your Laravel application. Perfect for in
 
 - 🔢 **Sequential Generation** - Automatic sequential number generation per type
 - 💾 **Database Persistence** - Reliable state storage in your database
+- 🔄 **Reset Periods** - Automatic reset (daily, monthly, yearly, or never)
+- 🔒 **Thread-Safe** - Race condition protection with database transactions
+- 🏢 **Multiple Sequences** - Separate sequences per type using scopes
+- 🎯 **Custom Starting Numbers** - Start sequences from any number
+- 📊 **Range Management** - Set maximum limits with exception handling
+- 📅 **Date-Based Formats** - Built-in date presenters for time-organized numbers
 - ⚙️ **Configurable** - Customize padding, formatting, and behavior
 - 🆔 **UUID Support** - Built-in UUID support for running number records
 - 🏷️ **Native PHP Enums** - Modern PHP 8.1+ enum support with Traitify
 - 🔧 **Extensible** - Custom generators and presenters via contracts
 - 🚀 **Developer Friendly** - Helper functions, facades, and excellent IDE support
-- ✅ **Well Tested** - Comprehensive test coverage
+- ✅ **Well Tested** - 51 tests with 124 assertions
 - 📦 **Wide Compatibility** - Laravel 9-12 & PHP 8.1-8.4
 
 ## 📦 Installation
@@ -111,7 +117,7 @@ Comprehensive documentation is available in the [docs](docs/) directory:
 - **[Getting Started](docs/01-getting-started/)** - Installation, quick start, and core concepts
 - **[Configuration](docs/02-configuration/)** - Configuration options, types, enums, and models
 - **[Usage](docs/03-usage/)** - Helper functions, facades, model integration, and examples
-- **[Advanced Topics](docs/04-advanced/)** - Custom presenters, generators, and integrations
+- **[Advanced Features](docs/04-advanced-features/)** - Date formats, scopes, ranges, and more
 - **[Development](docs/05-development/)** - Testing, contributing, and development setup
 
 ### Quick Links
@@ -119,7 +125,10 @@ Comprehensive documentation is available in the [docs](docs/) directory:
 - [Installation Guide](docs/01-getting-started/01-installation.md)
 - [Quick Start](docs/01-getting-started/02-quick-start.md)
 - [Common Scenarios](docs/03-usage/05-common-scenarios.md)
-- [Custom Presenters](docs/04-advanced/01-custom-presenters.md)
+- [Date-Based Formats](docs/04-advanced-features/01-date-based-formats.md)
+- [Multiple Sequences](docs/04-advanced-features/02-multiple-sequences.md)
+- [Custom Starting Numbers](docs/04-advanced-features/03-custom-starting-numbers.md)
+- [Number Range Management](docs/04-advanced-features/04-number-range-management.md)
 - [Upgrade Guide](docs/06-upgrade-guide.md)
 - [API Reference](docs/README.md)
 
