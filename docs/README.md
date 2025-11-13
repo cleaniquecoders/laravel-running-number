@@ -32,6 +32,7 @@ Practical examples and common usage patterns.
 - **[Common Scenarios](03-usage/05-common-scenarios.md)** - Real-world implementation examples
 - **[Artisan Commands](03-usage/06-artisan-commands.md)** - Managing running numbers via CLI
 - **[Events](03-usage/07-events.md)** - Listening to generation events for auditing and logging
+- **[REST API](03-usage/08-rest-api.md)** - HTTP endpoints for remote number generation
 
 ### [04. Features](04-features/)
 
@@ -105,10 +106,11 @@ Complete upgrade guide for all versions.
 - **Eloquent Trait**: Auto-generate numbers on model creation with InteractsWithRunningNumber
 - **Artisan Commands**: CLI commands for managing, listing, resetting, and creating running numbers
 - **Event System**: Built-in events for auditing, logging, and notifications
+- **REST API**: Optional HTTP endpoints for remote number generation and management
 - **Highly Configurable**: Customize padding, formatting, and behavior
 - **Extensible Architecture**: Custom generators and presenters via contracts
-- **Developer Friendly**: Helper functions, facades, trait, commands, events, and excellent IDE support
-- **Comprehensively Tested**: 128 tests, 315 assertions, PHPStan Level 5, 100% type coverage
+- **Developer Friendly**: Helper functions, facades, trait, commands, events, API, and excellent IDE support
+- **Comprehensively Tested**: 143 tests, 413 assertions, PHPStan Level 5, 100% type coverage
 - **Laravel 9-12**: Full support for Laravel 9.x, 10.x, 11.x, and 12.x
 - **PHP 8.1-8.4**: Supports PHP 8.1, 8.2, 8.3, and 8.4
 - **Production Ready**: Battle-tested for high-concurrency enterprise applications
@@ -307,16 +309,41 @@ DB::transaction(function () {
 // Uses row-level locking and atomic operations internally
 ```
 
+### Using REST API
+
+```bash
+# Generate a number via HTTP
+curl -X POST http://localhost:8000/api/running-numbers/generate \
+  -H "Content-Type: application/json" \
+  -d '{"type": "invoice", "scope": "retail"}'
+
+# Response:
+# {
+#   "success": true,
+#   "data": {
+#     "type": "INVOICE",
+#     "number": "INVOICE001",
+#     "scope": "retail"
+#   }
+# }
+
+# Check current number
+curl http://localhost:8000/api/running-numbers/current/invoice
+
+# Preview next number
+curl http://localhost:8000/api/running-numbers/preview/invoice
+```
+
 ## 📊 Package Statistics
 
-- **Total Tests**: 128 tests with 315 assertions
+- **Total Tests**: 143 tests with 413 assertions
 - **Code Quality**: PHPStan Level 5 with 0 errors
 - **Type Coverage**: 100% type hints on all methods
-- **Test Coverage**: Comprehensive coverage including edge cases and concurrency tests
+- **Test Coverage**: Comprehensive coverage including edge cases, concurrency, and API tests
 - **Laravel Support**: 9.x, 10.x, 11.x, 12.x
 - **PHP Support**: 8.1, 8.2, 8.3, 8.4
-- **Documentation**: 35+ pages of comprehensive guides with real-world examples
-- **New Features**: Eloquent trait, 3 Artisan commands, Event system
+- **Documentation**: 40+ pages of comprehensive guides with real-world examples
+- **New Features**: Eloquent trait, 3 Artisan commands, Event system, REST API
 
 ## 🆘 Getting Help
 

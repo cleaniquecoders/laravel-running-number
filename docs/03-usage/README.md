@@ -11,6 +11,7 @@ Learn how to use Laravel Running Number in your Laravel application with practic
 5. [Common Scenarios](05-common-scenarios.md) - Real-world usage examples
 6. [Artisan Commands](06-artisan-commands.md) - Managing running numbers via CLI
 7. [Events](07-events.md) - Listening to running number generation events
+8. [REST API](08-rest-api.md) - HTTP endpoints for remote number generation
 
 ## Quick Examples
 
