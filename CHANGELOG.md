@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-running-number` will be documented in this file.
 
+## 3.1.0 - 2026-03-31
+
+### What's Changed
+
+#### Added
+
+- Laravel 13 support (illuminate constraints include `^13.0`)
+- PHPUnit 12 compatibility
+- Pest 4 support
+
+#### Changed
+
+- Updated `phpunit.xml.dist` for PHPUnit 12
+- Standardized CI workflow (Laravel 12 + PHP 8.4/8.3)
+- Updated dev dependencies (larastan, phpstan plugins, collision)
+
+**Full Changelog**: https://github.com/cleaniquecoders/laravel-running-number/compare/3.0.0...3.1.0
+
 ## v3.0.0 - Major Feature Release (Planned)
 
 Version 3.0.0 represents a major advancement in the package, implementing comprehensive feature enhancements and architectural improvements.
@@ -9,11 +27,13 @@ Version 3.0.0 represents a major advancement in the package, implementing compre
 ### 🚀 Major Features
 
 #### Traitify Integration
+
 - **Native PHP Enums Support** - Migrated from `spatie/laravel-enum` to native PHP 8.1+ enums with `cleaniquecoders/traitify`
 - **UUID Support** - Full UUID support via `InteractsWithUuid` trait
 - **Enum Methods** - Enhanced enum capabilities with `values()`, `labels()`, `options()`, `descriptions()`
 
 #### Running Number Management
+
 - **Reset/Restart Functionality** - Reset running numbers or restart from custom starting points
 - **Date-Based Formats** - Generate numbers with configurable date components (e.g., `INV-2024-01-001`)
 - **Multiple Sequences** - Maintain separate sequences for the same type (branch-specific, department-specific)
@@ -21,18 +41,21 @@ Version 3.0.0 represents a major advancement in the package, implementing compre
 - **Range Management** - Define and enforce number ranges with overflow detection
 
 #### Generation Features
+
 - **Preview Mode** - Preview next number without persisting to database
 - **Bulk Generation** - Efficiently generate multiple numbers in a single operation
 - **Threading Safety** - Improved concurrency handling for high-volume generation
 - **Audit Trail** - Optional generation history tracking with user attribution
 
 #### Developer Experience
+
 - **Eloquent Trait** - New `HasRunningNumber` trait for seamless model integration
 - **Artisan Commands** - CLI commands for list, reset, restart, preview, and statistics
 - **Events System** - `RunningNumberGenerated` and `RunningNumberReset` events for extensibility
 - **Service Container Integration** - Enhanced dependency injection support
 
 ### 📚 Documentation
+
 - Complete documentation overhaul with structured guides
 - 20+ dedicated documentation files organized in progressive learning path
 - Comprehensive examples for common scenarios
@@ -48,11 +71,13 @@ Version 3.0.0 represents a major advancement in the package, implementing compre
 See the [Upgrade Guide](docs/06-upgrade-guide.md) for detailed migration instructions.
 
 ### 📦 Dependencies
+
 - Added `cleaniquecoders/traitify` for UUID and enum support
 - Minimum PHP 8.1+ required
 - Laravel 9-12 supported
 
 **Full Documentation**: See [docs/06-upgrade-guide.md](docs/06-upgrade-guide.md) for complete v3.0.0 upgrade guide
+
 
 ---
 
